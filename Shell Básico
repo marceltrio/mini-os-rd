@@ -1,0 +1,73 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_PROCESOS 5
+
+typedef struct {
+    int pid;
+    int estado; // 0: Inactivo, 1: Activo, 2: En espera
+    int prioridad;
+} Proceso;
+
+Proceso procesos[MAX_PROCESOS];
+
+void iniciar_proceso(int pid, int prioridad) {
+    if (pid < MAX_PROCESOS && procesos[pid].estado == 0) {
+        procesos[pid].pid = pid;
+        procesos[pid].estado = 1;
+        procesos[pid].prioridad = prioridad;
+        printf("Proceso %d iniciado con prioridad %d\n", pid, prioridad);
+    } else {
+        printf("Error al iniciar proceso %d\n", pid);
+    }
+}
+
+void terminar_proceso(int pid) {
+    if (pid < MAX_PROCESOS && procesos[pid].estado == 1) {
+        procesos[pid].estado = 0;
+        printf("Proceso %d terminado\n", pid);
+    } else {
+        printf("Error al terminar proceso %d\n", pid);
+    }
+}
+
+void planificar() {
+    for (int i = 0; i < MAX_PROCESOS; i++) {
+        if (procesos[i].estado == 1) {
+            printf("Ejecutando proceso %d con prioridad %d\n", procesos[i].pid, procesos[i].prioridad);
+        }
+    }
+}
+
+int main() {
+    char comando[50];
+    int pid, prioridad;
+
+    // Inicializar procesos
+    for (int i = 0; i < MAX_PROCESOS; i++) {
+        procesos[i].estado = 0;
+    }
+
+    while (1) {
+        printf("shell> ");
+        fgets(comando, 50, stdin);
+        comando[strcspn(comando, "\n")] = 0; // Eliminar el salto de línea
+
+        if (strncmp(comando, "iniciar", 7) == 0) {
+            sscanf(comando + 8, "%d %d", &pid, &prioridad);
+            iniciar_proceso(pid, prioridad);
+        } else if (strncmp(comando, "terminar", 8) == 0) {
+            sscanf(comando + 9, "%d", &pid);
+            terminar_proceso(pid);
+        } else if (strncmp(comando, "planificar", 10) == 0) {
+            planificar();
+        } else if (strncmp(comando, "salir", 5) == 0) {
+            break;
+        } else {
+            printf("Comando no reconocido\n");
+        }
+    }
+
+    return 0;
+}
