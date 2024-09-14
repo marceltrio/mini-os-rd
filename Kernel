@@ -1,0 +1,59 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Simulación de procesos
+typedef struct {
+    int pid;
+    int estado; // 0: Inactivo, 1: Activo, 2: En espera
+    int prioridad;
+} Proceso;
+
+#define MAX_PROCESOS 5
+Proceso procesos[MAX_PROCESOS];
+
+// Iniciar procesos
+void iniciar_proceso(int pid, int prioridad) {
+    if (pid < MAX_PROCESOS && procesos[pid].estado == 0) {
+        procesos[pid].pid = pid;
+        procesos[pid].estado = 1;
+        procesos[pid].prioridad = prioridad;
+        printf("Proceso %d iniciado con prioridad %d\n", pid, prioridad);
+    } else {
+        printf("Error al iniciar proceso %d\n", pid);
+    }
+}
+
+// Terminar procesos
+void terminar_proceso(int pid) {
+    if (pid < MAX_PROCESOS && procesos[pid].estado == 1) {
+        procesos[pid].estado = 0;
+        printf("Proceso %d terminado\n", pid);
+    } else {
+        printf("Error al terminar proceso %d\n", pid);
+    }
+}
+
+// Planificación simple (Round Robin)
+void planificar() {
+    for (int i = 0; i < MAX_PROCESOS; i++) {
+        if (procesos[i].estado == 1) {
+            printf("Ejecutando proceso %d con prioridad %d\n", procesos[i].pid, procesos[i].prioridad);
+            // Simula ejecución del proceso
+        }
+    }
+}
+
+int main() {
+    // Inicializar procesos
+    for (int i = 0; i < MAX_PROCESOS; i++) {
+        procesos[i].estado = 0;
+    }
+
+    iniciar_proceso(1, 5);
+    iniciar_proceso(2, 3);
+    planificar();
+    terminar_proceso(1);
+    planificar();
+    
+    return 0;
+}
