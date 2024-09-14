@@ -1,0 +1,98 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Simulación de procesos
+typedef struct {
+    int pid;
+    int estado; // 0: Inactivo, 1: Activo
+} Proceso;
+
+#define MAX_PROCESOS 5
+Proceso procesos[MAX_PROCESOS];
+
+// Funciones para procesos
+void iniciar_proceso(int pid) {
+    if (pid < 0 || pid >= MAX_PROCESOS) {
+        printf("[ERROR] ID de proceso inválido: %d\n", pid);
+        return;
+    }
+    if (procesos[pid].estado == 0) {
+        procesos[pid].pid = pid;
+        procesos[pid].estado = 1;
+        printf("[INFO] Proceso %d iniciado\n", pid);
+    } else {
+        printf("[ERROR] No se pudo iniciar el proceso %d (ya está activo)\n", pid);
+    }
+}
+
+void terminar_proceso(int pid) {
+    if (pid < 0 || pid >= MAX_PROCESOS) {
+        printf("[ERROR] ID de proceso inválido: %d\n", pid);
+        return;
+    }
+    if (procesos[pid].estado == 1) {
+        procesos[pid].estado = 0;
+        printf("[INFO] Proceso %d terminado\n", pid);
+    } else {
+        printf("[ERROR] No se pudo terminar el proceso %d (ya está inactivo)\n", pid);
+    }
+}
+
+void planificar() {
+    printf("\n[INFO] Procesos activos:\n");
+    for (int i = 0; i < MAX_PROCESOS; i++) {
+        if (procesos[i].estado == 1) {
+            printf("  - Proceso %d (Activo)\n", procesos[i].pid);
+        }
+    }
+    printf("\n");
+}
+
+// Función para mostrar el menú
+void mostrar_menu() {
+    printf("=================================\n");
+    printf("         Mini Sistema OS         \n");
+    printf("=================================\n");
+    printf("Comandos disponibles:\n");
+    printf("  run <PID>   - Iniciar un proceso\n");
+    printf("  kill <PID>  - Terminar un proceso\n");
+    printf("  ps          - Mostrar procesos activos\n");
+    printf("  exit        - Salir del sistema\n");
+    printf("=================================\n");
+}
+
+void shell() {
+    char comando[256];
+    
+    mostrar_menu();
+    
+    while (1) {
+        printf("\nminiOS> ");
+        fgets(comando, sizeof(comando), stdin);
+        
+        if (strncmp(comando, "run", 3) == 0) {
+            int pid = atoi(&comando[4]);
+            iniciar_proceso(pid);
+        } else if (strncmp(comando, "kill", 4) == 0) {
+            int pid = atoi(&comando[5]);
+            terminar_proceso(pid);
+        } else if (strncmp(comando, "ps", 2) == 0) {
+            planificar();
+        } else if (strncmp(comando, "exit", 4) == 0) {
+            printf("[INFO] Saliendo del sistema...\n");
+            break;
+        } else {
+            printf("[ERROR] Comando no reconocido\n");
+        }
+    }
+}
+
+int main() {
+    for (int i = 0; i < MAX_PROCESOS; i++) {
+        procesos[i].estado = 0;
+    }
+    
+    shell();
+    return 0;
+}
