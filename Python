@@ -1,0 +1,79 @@
+import tkinter as tk
+from tkinter import messagebox
+
+# Simulación de procesos
+class Proceso:
+    def __init__(self, pid):
+        self.pid = pid
+        self.activo = False
+
+class MiniOS:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Mini OS")
+        self.procesos = [Proceso(i) for i in range(10)]  # Aumentar el número de procesos
+        
+        # Crear botones y entradas
+        self.label = tk.Label(root, text="Mini Sistema Operativo", font=("Arial", 16))
+        self.label.pack(pady=10)
+        
+        self.run_label = tk.Label(root, text="Iniciar proceso (PID 0-9):")
+        self.run_label.pack(pady=5)
+        
+        self.pid_entry = tk.Entry(root)
+        self.pid_entry.pack(pady=5)
+        
+        self.run_button = tk.Button(root, text="Iniciar", command=self.iniciar_proceso)
+        self.run_button.pack(pady=5)
+        
+        self.kill_button = tk.Button(root, text="Terminar", command=self.terminar_proceso)
+        self.kill_button.pack(pady=5)
+        
+        self.ps_button = tk.Button(root, text="Mostrar Procesos", command=self.mostrar_procesos)
+        self.ps_button.pack(pady=5)
+        
+        self.log_text = tk.Text(root, height=10, width=50)
+        self.log_text.pack(pady=5)
+        
+        self.exit_button = tk.Button(root, text="Salir", command=root.quit)
+        self.exit_button.pack(pady=5)
+        
+    def iniciar_proceso(self):
+        pid = self.obtener_pid()
+        if pid is not None and not self.procesos[pid].activo:
+            self.procesos[pid].activo = True
+            self.log_text.insert(tk.END, f"Proceso {pid} iniciado.\n")
+            messagebox.showinfo("Éxito", f"Proceso {pid} iniciado.")
+        else:
+            messagebox.showerror("Error", f"No se puede iniciar el proceso {pid}.")
+        
+    def terminar_proceso(self):
+        pid = self.obtener_pid()
+        if pid is not None and self.procesos[pid].activo:
+            self.procesos[pid].activo = False
+            self.log_text.insert(tk.END, f"Proceso {pid} terminado.\n")
+            messagebox.showinfo("Éxito", f"Proceso {pid} terminado.")
+        else:
+            messagebox.showerror("Error", f"No se puede terminar el proceso {pid}.")
+    
+    def mostrar_procesos(self):
+        activos = [p.pid for p in self.procesos if p.activo]
+        procesos_activos = " ".join(map(str, activos)) if activos else "Ninguno"
+        self.log_text.insert(tk.END, f"Procesos activos: {procesos_activos}\n")
+        messagebox.showinfo("Procesos Activos", f"Procesos activos: {procesos_activos}")
+        
+    def obtener_pid(self):
+        try:
+            pid = int(self.pid_entry.get())
+            if 0 <= pid <= 9:
+                return pid
+            else:
+                raise ValueError
+        except ValueError:
+            messagebox.showerror("Error", "Ingrese un PID válido (0-9).")
+            return None
+
+# Crear la ventana principal
+root = tk.Tk()
+app = MiniOS(root)
+root.mainloop()
